@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>Region-Resolve</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f0f23, #1a1a2e, #16213e);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+      min-height: 100vh;
+      color: #ffffff;
+      overflow-x: hidden;
+      overflow-y: auto;
+          display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 2rem;
+    }
+
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .profile-card {
+      width: 100%;
+      max-width: 600px;
+      background: rgba(28, 28, 46, 0.95);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .profile-card h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #ffffff, #7877c6);
+      -webkit-background-clip: text;
+        background-clip: text;         
+      -webkit-text-fill-color: transparent;
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    label {
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      display: block;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 0.8rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(44,44,62,0.8);
+      color: white;
+      font-size: 1rem;
+      transition: 0.3s;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      border-color: #7877c6;
+      background: rgba(44,44,62,1);
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    button {
+      padding: 0.8rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    #getLocationBtn {
+      background: #17a2b8;
+    }
+
+    #getLocationBtn:hover {
+      background: #138496;
+    }
+
+    button[type="submit"] {
+      background: #7877c6;
+    }
+
+    button[type="submit"]:hover {
+      background: #6c63ff;
+    }
+
+    .back-button {
+      background: #17a2b8;
+    }
+
+    .back-button:hover {
+      background: #138496;
+    }
+
+    #locationDisplay {
+      font-size: 0.9rem;
+      color: #28a745;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+ /* ✅ Added custom alert styling */
+    .custom-alert {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      background: rgba(28, 28, 46, 0.95);
+      color: white;
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      font-size: 1rem;
+      text-align: center;
+      z-index: 9999;
+      opacity: 0;
+      transition: all 0.3s ease;
+      min-width: 250px;
+    }
+
+    .custom-alert.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+     .back-arrow {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 24px;
+      color: white;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 8px 10px;
+      border-radius: 50%;
+      text-decoration: none;
+      transition: 0.3s;
+      z-index: 10000;
+    }
+    .back-arrow:hover {
+      background: #ffda77;
+      color: black;
+    }
+
+  </style>
+</head>
+<body>
+  <a href="javascript:void(0)" class="back-arrow" onclick="window.history.back();">
+  <i class="fa fa-arrow-left"></i>
+</a>
+
+  <div class="profile-card">
+    <h2>Report a Local Problem</h2>
+    <form id="problemForm">
+      <label>Title:</label>
+      <input type="text" id="title" placeholder="ex:about street light" required>
+
+      <label>Description:</label>
+      <textarea id="description" placeholder="Explain the problem in detail..." required></textarea>
+
+      <label>District:</label>
+      <input type="text" id="district" placeholder="Enter District" required>
+
+      <label>Region:</label>
+      <input type="text" id="region" placeholder="Enter Region" required>
+
+      <label>Location (optional):</label>
+      <button type="button" id="getLocationBtn">Share My Location</button>
+      <p id="locationDisplay"></p>
+
+      <label class="checkbox-label">
+        <input type="checkbox" id="anonymous"> Post Anonymously
+      </label>
+
+      <button type="submit">Submit Problem</button>
+    </form>
+    <br>
+   
+  </div>
+  <!-- ✅ Added custom alert container -->
+  <div id="customAlert" class="custom-alert"></div>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD3wnvW8xLSiFXZ65GOcVQ40c5qeIsCHyw",
+    authDomain: "major-project-d33e0.firebaseapp.com",
+    projectId: "major-project-d33e0",
+    storageBucket: "major-project-d33e0.firebasestorage.app",
+    messagingSenderId: "833100408662",
+    appId: "1:833100408662:web:f294cddaee7840d31c58f7",
+    measurementId: "G-QYTJKF31RW"
+
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+  
+ /* ✅ Added custom alert function */
+    function showAlert(message) {
+      const alertBox = document.getElementById("customAlert");
+      alertBox.textContent = message;
+      alertBox.classList.add("show");
+      setTimeout(() => {
+        alertBox.classList.remove("show");
+      }, 2500);
+    }
+    let userLocation = "";
+
+    document.getElementById("getLocationBtn").addEventListener("click", () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          userLocation = `${position.coords.latitude}, ${position.coords.longitude}`;
+          document.getElementById("locationDisplay").innerText = "Location Captured: " + userLocation;
+        }, () => {
+          showAlert("Unable to get location. Please allow location access.");
+        });
+      } else {
+        showAlert("Geolocation is not supported by this browser.");
+      }
+    });
+
+    document.getElementById("problemForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const user = auth.currentUser;
+      if (!user) {
+        showAlert("Please login first!");
+        return;
+      }
+
+      const title = document.getElementById("title").value;
+      const description = document.getElementById("description").value;
+      const district = document.getElementById("district").value;
+      const region = document.getElementById("region").value;
+      const anonymous = document.getElementById("anonymous").checked;
+
+      await db.collection("posts").add({
+        title, description, district, region, anonymous,
+        location: userLocation, userId: user.uid,
+        createdAt: new Date().toISOString(),
+        status: "pending"
+      });
+
+      showAlert("Problem reported successfully!");
+     
+    });
+  </script>
+</body>
+</html>

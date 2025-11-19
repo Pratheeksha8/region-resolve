@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Region Resolve</title>
+  <link rel="stylesheet" href="style1.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="signup-container">
+    <div class="left-card">
+      <div class="card-content">
+        <div class="card-title">REGION RESOLVE</div>
+        <h2>Stronger Communities, Brighter Futures.</h2>
+        <p>Join our platform to report local issues and help authorities respond faster.</p>
+        <p class="signin-text">Already have an account? <a href="signin.html">Sign in</a></p>
+      </div>
+    </div>
+
+    <div class="right-form">
+      <h1>Create Account</h1>
+      <form id="signupForm">
+        <label>Email address</label>
+        <input type="email" id="email" placeholder="Enter your email" required />
+
+        <label>Set password</label>
+        <input type="password" id="password" placeholder="Enter password" required />
+        <div class="show-password">
+          <input type="checkbox" id="showPass">
+          <label for="showPass">Show password</label>
+        </div>
+
+        <label>Select your role</label>
+        <select id="role" required>
+          <option value="">-- Select Role --</option>
+          <option value="Citizen">Citizen</option>
+          <option value="Official">Official</option>
+        </select>
+
+        <!-- Dynamic Designation Input -->
+        <div id="designationField" style="display:none;">
+          <label>Enter Designation</label>
+          <input type="text" id="designation" placeholder="Enter your designation" />
+          <label>Enter Region</label>
+          <input type="text" id="region" placeholder="Enter your region" />
+          <label>Enter District</label>
+          <input type="text" id="district" placeholder="Enter your district" />
+        </div>
+
+        <button type="submit" class="signup-btn">Sign up →</button>
+
+       
+      </form>
+      <p id="errorMsg"></p>
+      <p id="successMsg"></p>
+    </div>
+  </div>
+
+  <!-- Overlay and Modal -->
+  <div id="overlay" class="overlay">
+    <div id="messageBox" class="message-box">
+      <h3 id="messageTitle"></h3>
+      <p id="messageText"></p>
+      <button id="okButton">OK</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+    // 🧹 Delete any cached app from an older project (prevents wrong project ID)
+    if (getApps().length > 0) {
+      await deleteApp(getApps()[0]);
+    }
+
+    // ✅ Correct Firebase configuration for proj-a34b4
+    const firebaseConfig = {
+      apiKey: "AIzaSyD3wnvW8xLSiFXZ65GOcVQ40c5qeIsCHyw",
+    authDomain: "major-project-d33e0.firebaseapp.com",
+    projectId: "major-project-d33e0",
+    storageBucket: "major-project-d33e0.firebasestorage.app",
+    messagingSenderId: "833100408662",
+    appId: "1:833100408662:web:f294cddaee7840d31c58f7",
+    measurementId: "G-QYTJKF31RW"
+
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Friendly error messages
+    function friendlyErrorMessage(code) {
+      switch (code) {
+        case "auth/email-already-in-use": return "This email is already registered. Please sign in instead.";
+        case "auth/invalid-email": return "Please enter a valid email address.";
+        case "auth/weak-password": return "Password is too weak. Please choose a stronger one.";
+        default: return "An unexpected error occurred. Please try again.";
+      }
+    }
+
+    // Modal display
+    function showMessage(title, message, type, redirect = false) {
+      document.getElementById("messageTitle").innerText = title;
+      document.getElementById("messageText").innerText = message;
+      const messageBox = document.getElementById("messageBox");
+      messageBox.className = "message-box " + type;
+      document.getElementById("overlay").style.display = "flex";
+
+      document.getElementById("okButton").onclick = function () {
+        document.getElementById("overlay").style.display = "none";
+
+        if (type === "success") {
+          document.getElementById("signupForm").reset();
+          document.getElementById("designationField").style.display = "none";
+        }
+
+        if (redirect) {
+          window.location.href = "signin.html";
+        }
+      };
+    }
+
+    // Password visibility toggle
+    document.getElementById("showPass").addEventListener("change", function() {
+      const passwordField = document.getElementById("password");
+      passwordField.type = this.checked ? "text" : "password";
+    });
+
+    // Show designation inputs for Officials
+    document.getElementById("role").addEventListener("change", function() {
+      document.getElementById("designationField").style.display = this.value === "Official" ? "block" : "none";
+    });
+
+    // 🧠 Signup form submit
+    document.getElementById("signupForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const role = document.getElementById("role").value;
+      const designation = document.getElementById("designation").value.trim();
+      const region = document.getElementById("region").value.trim();
+      const district = document.getElementById("district").value.trim();
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        const userId = user.uid;
+
+        await setDoc(doc(db, "users", userId), {
+          userId,
+          email,
+          role,
+          designation: role === "Official" ? designation : null,
+          region: role === "Official" ? region : null,
+          district: role === "Official" ? district : null,
+          createdAt: new Date()
+        });
+
+        if (role === "Citizen") {
+          await setDoc(doc(db, "localids", userId), { userId, email });
+        } else {
+          await setDoc(doc(db, "officialids", userId), { userId, email });
+        }
+
+        showMessage("Success", `Account created successfully! Your Unique ID: ${userId}`, "success", true);
+
+      } catch (error) {
+        console.error("Signup error:", error);
+        showMessage("Error", friendlyErrorMessage(error.code), "error");
+      }
+    });
+  </script>
+</body>
+</html>

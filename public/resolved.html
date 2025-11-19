@@ -1,0 +1,141 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resolved Posts - Region Resolve</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="pending.css">
+</head>
+<body>
+  <a href="all-post.html" class="back-arrow"><i class="fa fa-arrow-left"></i></a>
+  <div class="container">
+    <div class="header">
+      <i class="fas fa-check-circle"></i>
+      <h2>Resolved Posts</h2>
+      <div class="subtitle">All posts marked as resolved</div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search by region or district...">
+        <button id="clearSearch"><i class="fas fa-times"></i></button>
+      </div>
+    </div>
+
+    <!-- Posts Container (match CSS grid id) -->
+    <div id="pendingPostsContainer">
+      <div class="loading-state">
+        <i class="fas fa-spinner fa-spin"></i> Loading resolved posts...
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyD3wnvW8xLSiFXZ65GOcVQ40c5qeIsCHyw",
+    authDomain: "major-project-d33e0.firebaseapp.com",
+    projectId: "major-project-d33e0",
+    storageBucket: "major-project-d33e0.firebasestorage.app",
+    messagingSenderId: "833100408662",
+    appId: "1:833100408662:web:f294cddaee7840d31c58f7",
+    measurementId: "G-QYTJKF31RW"
+
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let allResolvedPosts = [];
+
+    async function loadResolvedPosts() {
+      const container = document.getElementById("pendingPostsContainer");
+      try {
+        const snapshot = await db.collection("posts").where("status", "==", "resolved").get();
+        if (snapshot.empty) {
+          container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i> No resolved posts found!</div>`;
+          return;
+        }
+        allResolvedPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        displayResolvedPosts(allResolvedPosts);
+      } catch (e) {
+        console.error(e);
+        container.innerHTML = `<div class="error-state"><i class="fas fa-exclamation-triangle"></i> Error loading posts!</div>`;
+      }
+    }
+
+    function displayResolvedPosts(posts) {
+      const container = document.getElementById("pendingPostsContainer");
+      if (!posts.length) {
+        container.innerHTML = `<div class="empty-state"><i class="fas fa-search"></i> No posts match your search!</div>`;
+        return;
+      }
+      container.innerHTML = "";
+      posts.forEach(post => {
+        container.innerHTML += `
+          <div class="post-card">
+            <div class="stats-badge">Resolved</div>
+            <div class="post-content">
+              <div class="post-title"><i class="fas fa-file-alt"></i> ${post.title || "Untitled"}</div>
+              
+              <div class="post-info">
+                <i class="fas fa-align-left"></i>
+                <div>
+                  <div class="post-info-label">Description</div>
+                  <div class="post-info-value">${post.description || "No description provided"}</div>
+                </div>
+              </div>
+              
+              <div class="post-info">
+                <i class="fas fa-map-marker-alt"></i>
+                <div>
+                  <div class="post-info-label">Region</div>
+                  <div class="post-info-value">${post.region || "Not specified"}</div>
+                </div>
+              </div>
+              
+              <div class="post-info">
+                <i class="fas fa-city"></i>
+                <div>
+                  <div class="post-info-label">District</div>
+                  <div class="post-info-value">${post.district || "Not specified"}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function filterResolvedPosts() {
+      const searchTerm = document.getElementById("searchInput").value.toLowerCase().trim();
+      const clearBtn = document.getElementById("clearSearch");
+      clearBtn.style.display = searchTerm ? "block" : "none";
+
+      if (!searchTerm) return displayResolvedPosts(allResolvedPosts);
+
+      const filtered = allResolvedPosts.filter(post => 
+        (post.region || "").toLowerCase().startsWith(searchTerm) ||
+        (post.district || "").toLowerCase().startsWith(searchTerm)
+      );
+      displayResolvedPosts(filtered);
+    }
+
+    function clearSearch() {
+      document.getElementById("searchInput").value = "";
+      document.getElementById("clearSearch").style.display = "none";
+      displayResolvedPosts(allResolvedPosts);
+    }
+
+    window.onload = () => {
+      loadResolvedPosts();
+      document.getElementById("searchInput").addEventListener("input", filterResolvedPosts);
+      document.getElementById("clearSearch").addEventListener("click", clearSearch);
+    };
+  </script>
+</body>
+</html>
