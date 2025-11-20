@@ -201,10 +201,12 @@ body::-webkit-scrollbar {
       <label>Region:</label>
       <input type="text" id="region" placeholder="Enter Region" required>
 
-      <label>Location (optional):</label>
+      <label>Location :</label>
       <button type="button" id="getLocationBtn">Share My Location</button>
       <p id="locationDisplay"></p>
-
+<a id="mapsLink" href="#" target="_blank" style="color:#4ecdc4; font-size:0.9rem; display:none; margin-top:5px;">
+  View on Google Maps
+</a>
       <label class="checkbox-label">
         <input type="checkbox" id="anonymous"> Post Anonymously
       </label>
@@ -251,8 +253,18 @@ body::-webkit-scrollbar {
     document.getElementById("getLocationBtn").addEventListener("click", () => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((position) => {
-          userLocation = `${position.coords.latitude}, ${position.coords.longitude}`;
-          document.getElementById("locationDisplay").innerText = "Location Captured: " + userLocation;
+       const lat = position.coords.latitude;
+  const lng = position.coords.longitude;
+
+  userLocation = `${lat}, ${lng}`;
+
+  document.getElementById("locationDisplay").innerText =
+    "Location Captured: " + userLocation;
+
+  // Show Google Maps clickable link
+  const mapsLink = document.getElementById("mapsLink");
+  mapsLink.style.display = "block";
+  mapsLink.href = `https://www.google.com/maps?q=${lat},${lng}`;
         }, () => {
           showAlert("Unable to get location. Please allow location access.");
         });

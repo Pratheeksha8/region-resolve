@@ -140,7 +140,20 @@
             <div class="location-item"><div class="location-label">Region</div><div class="location-value">${post.region || "Not specified"}</div></div>
             <div class="location-item"><div class="location-label">District</div><div class="location-value">${post.district || "Not specified"}</div></div>
             <div class="location-item"><div class="location-label">Status</div><div class="location-value"><span class="post-status ${post.status === "resolved" ? "status-resolved" : "status-pending"}">${post.status || "pending"}</span></div></div>
-            ${post.location ? `<div class="location-item"><div class="location-label">Location</div><div class="location-value">${post.location}</div></div>` : ""}
+            ${post.location ? `
+  <div class="location-item">
+    <div class="location-label">Location</div>
+    <div class="location-value">
+      ${post.location}
+      <br>
+      <a href="https://www.google.com/maps?q=${post.location}"
+         target="_blank"
+         style="color:#4ecdc4; font-size:0.85rem; text-decoration:underline;">
+        View on Google Maps
+      </a>
+    </div>
+  </div>` : ""}
+
           </div>
 
           <div class="post-description">

@@ -272,6 +272,24 @@ body {
 
     .message-box.success { border-left: 6px solid #28a745; }
     .message-box.error { border-left: 6px solid #dc3545; }
+    
+     .back-arrow {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 24px;
+      color: white;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 8px 10px;
+      border-radius: 50%;
+      text-decoration: none;
+      transition: 0.3s;
+      z-index: 10000;
+    }
+    .back-arrow:hover {
+      background: #ffda77;
+      color: black;
+    }
 
     @keyframes scaleIn {
       from { transform: scale(0.7); opacity: 0; }
