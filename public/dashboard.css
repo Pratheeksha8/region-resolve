@@ -481,3 +481,37 @@ body {
     border-color: var(--bg-card) transparent transparent transparent;
   }
 }
+#alertContainer {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Base alert style */
+.alert {
+  opacity: 0;
+  transform: translateX(100%);
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+
+/* Show animation */
+.alert.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Different types */
+.alert.info { background-color: #3498db; }     /* Blue */
+.alert.success { background-color: #2ecc71; }  /* Green */
+.alert.error { background-color: #e74c3c; }    /* Red */
+.alert.warning { background-color: #f39c12; }  /* Orange */
