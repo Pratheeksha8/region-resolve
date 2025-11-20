@@ -24,6 +24,8 @@
     <div class="sidebar">
       <div class="nav-item active" data-tab="profile" data-title="Profile" onclick="switchTab('profile')">👤</div>
       <div class="nav-item" data-tab="allpost" data-title="All Posts" onclick="switchTab('allpost')">🗂️</div>
+      <div class="nav-item" data-title="Go Home" onclick="goHome()">🏠</div>
+
       <div class="nav-item" onclick="logout()" data-title="Logout" style="margin-top: auto; color: var(--error);">🚪</div>
     </div>
 
@@ -106,6 +108,10 @@
       window.location.href = "signin.html";
     }
   });
+
+  function goHome() {
+  window.location.href = "index.html";  // ← change to your real home page
+}
 
   function showDashboard() {
     loadingOverlay.style.display = "none";

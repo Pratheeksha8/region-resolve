@@ -25,6 +25,8 @@
       <div class="nav-item active" data-tab="profile" data-title="Profile" onclick="switchTab('profile')">👤</div>
        <div class="nav-item" data-tab="allpost" data-title="All posts" onclick="switchTab('allpost')">🗂️</div>
       <div class="nav-item" data-tab="post" data-title="Post one" onclick="switchTab('post')">✏️</div>
+      <div class="nav-item" data-title="Go Home" onclick="goHome()">🏠</div>
+
       
       <div class="nav-item" onclick="logout()"  data-title="Logout" style="margin-top: auto; color: var(--error);">🚪</div>
     </div>
@@ -134,6 +136,9 @@
       console.error("Error loading user data:", err);
     }
   }
+function goHome() {
+  window.location.href = "index.html"; 
+}
 
   // Load posts for this user only + Show status + Delete button
   async function loadUserPosts(uid) {
