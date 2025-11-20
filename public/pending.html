@@ -1,137 +1,704 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pending Posts - Region Resolve</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feed - Pending Posts</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="pending.css">
- 
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* Sticky Header */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: 1rem 0;
+    }
+
+    .header-content {
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .back-arrow {
+      background: rgba(120,119,198,0.15);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffda77;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255,218,119,0.2);
+    }
+
+    .back-arrow:hover {
+      background: rgba(120,119,198,0.3);
+      transform: scale(1.1);
+    }
+
+    .header-title {
+      flex: 1;
+    }
+
+    .header-title h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff, #ffda77);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.2rem;
+    }
+
+    .header-subtitle {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .stats-badge {
+      background: linear-gradient(135deg, #7877c6, #a199d4);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Search Bar */
+    .search-container {
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      position: sticky;
+      top: 76px;
+      z-index: 99;
+      background: rgba(10, 10, 10, 0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    .search-box {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 30px;
+      padding: 0.8rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      transition: all 0.3s ease;
+    }
+
+    .search-box:focus-within {
+      background: rgba(255,255,255,0.08);
+      border-color: #7877c6;
+      box-shadow: 0 0 0 3px rgba(120,119,198,0.1);
+    }
+
+    .search-box i {
+      color: rgba(255,255,255,0.4);
+    }
+
+    .search-box input {
+      flex: 1;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .search-box input::placeholder {
+      color: rgba(255,255,255,0.3);
+    }
+
+    .clear-search {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.4);
+      cursor: pointer;
+      padding: 0.3rem;
+      display: none;
+      transition: all 0.3s ease;
+    }
+
+    .clear-search:hover {
+      color: #fff;
+    }
+
+    /* Feed Container */
+    .feed-container {
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem 2rem;
+    }
+
+    /* Post Card - Instagram/Twitter Style */
+    .post-card {
+      background: rgba(26, 26, 46, 0.4);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.5s ease backwards;
+    }
+
+    .post-card:hover {
+      border-color: rgba(120,119,198,0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Post Header */
+    .post-header {
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .post-status {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .status-icon {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffda77, #ffa07a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .status-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .status-label {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .status-value {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #ffda77;
+    }
+
+    .post-menu {
+      background: rgba(120,119,198,0.1);
+      border: 1px solid rgba(120,119,198,0.2);
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .post-menu:hover {
+      background: rgba(120,119,198,0.2);
+      color: #fff;
+    }
+
+    /* Post Content */
+    .post-content {
+      padding: 1.5rem 1.5rem 1rem;
+    }
+
+    .post-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+
+    .post-description {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.8);
+      line-height: 1.7;
+      margin-bottom: 1.2rem;
+    }
+
+    .post-meta {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .meta-item i {
+      color: #7877c6;
+      font-size: 0.9rem;
+    }
+
+    .meta-item strong {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Post Actions */
+    .post-actions {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    .action-btn {
+      flex: 1;
+      padding: 0.8rem 1.2rem;
+      border-radius: 12px;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(135deg, #7877c6, #a199d4);
+      color: #fff;
+    }
+
+    .action-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(120,119,198,0.4);
+    }
+
+    .action-btn.secondary {
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.8);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .action-btn.secondary:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* Loading States */
+    .loading-state, .empty-state, .error-state {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .loading-state i {
+      font-size: 2.5rem;
+      color: #7877c6;
+      margin-bottom: 1rem;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .empty-state i, .error-state i {
+      font-size: 3rem;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 1rem;
+    }
+
+    .load-more {
+      text-align: center;
+      padding: 2rem;
+      color: rgba(255,255,255,0.5);
+      font-size: 0.9rem;
+    }
+
+    /* Scroll to Top Button */
+    .scroll-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7877c6, #ffda77);
+      border: none;
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      opacity: 0;
+      transform: scale(0);
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 20px rgba(120,119,198,0.4);
+      z-index: 100;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .scroll-top:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 30px rgba(120,119,198,0.6);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .header-content {
+        padding: 0 1rem;
+      }
+
+      .header-title h1 {
+        font-size: 1.2rem;
+      }
+
+      .stats-badge {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+      }
+
+      .feed-container {
+        padding: 0.5rem 1rem 2rem;
+      }
+
+      .post-card {
+        border-radius: 15px;
+      }
+
+      .post-title {
+        font-size: 1.1rem;
+      }
+
+      .post-actions {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 <body>
-      <a href="all-post.html" class="back-arrow"><i class="fa fa-arrow-left"></i></a>
-  <div class="container">
-    <div class="header">
-      <i class="fas fa-clock"></i>
-      <h2>Pending Posts</h2>
-      <div class="subtitle">Review and manage posts awaiting approval</div>
-    </div>
-
-    <!-- Search Bar -->
-    <div class="search-container">
-      <div class="search-box">
-        <i class="fas fa-search"></i>
-        <input type="text" id="searchInput" placeholder="Search by region or district...">
-        <button id="clearSearch"><i class="fas fa-times"></i></button>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <a href="all-post.html" class="back-arrow">
+        <i class="fa fa-arrow-left"></i>
+      </a>
+      <div class="header-title">
+        <h1><i class="fas fa-stream"></i> Pending Feed</h1>
+        <div class="header-subtitle">Review posts awaiting approval</div>
       </div>
-    </div>
-
-    <!-- Posts Container -->
-    <div id="pendingPostsContainer">
-      <div class="loading-state">
-        <i class="fas fa-spinner fa-spin"></i> Loading pending posts...
+      <div class="stats-badge">
+        <i class="fas fa-clock"></i>
+        <span id="postCount">0</span>
       </div>
     </div>
   </div>
+
+  <!-- Search Bar -->
+  <div class="search-container">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Search by region, district, or title...">
+      <button class="clear-search" id="clearSearch">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Feed Container -->
+  <div class="feed-container" id="feedContainer">
+    <div class="loading-state">
+      <i class="fas fa-spinner"></i>
+      <div>Loading your feed...</div>
+    </div>
+  </div>
+
+  <!-- Scroll to Top Button -->
+  <button class="scroll-top" id="scrollTop">
+    <i class="fas fa-arrow-up"></i>
+  </button>
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
     const firebaseConfig = {
-        apiKey: "AIzaSyD3wnvW8xLSiFXZ65GOcVQ40c5qeIsCHyw",
-    authDomain: "major-project-d33e0.firebaseapp.com",
-    projectId: "major-project-d33e0",
-    storageBucket: "major-project-d33e0.firebasestorage.app",
-    messagingSenderId: "833100408662",
-    appId: "1:833100408662:web:f294cddaee7840d31c58f7",
-    measurementId: "G-QYTJKF31RW"
-
+      apiKey: "AIzaSyD3wnvW8xLSiFXZ65GOcVQ40c5qeIsCHyw",
+      authDomain: "major-project-d33e0.firebaseapp.com",
+      projectId: "major-project-d33e0",
+      storageBucket: "major-project-d33e0.firebasestorage.app",
+      messagingSenderId: "833100408662",
+      appId: "1:833100408662:web:f294cddaee7840d31c58f7",
+      measurementId: "G-QYTJKF31RW"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
     let allPosts = [];
+    let displayedPosts = [];
+    let currentIndex = 0;
+    const POSTS_PER_LOAD = 10;
 
-    async function loadPendingPosts() {
-      const container = document.getElementById("pendingPostsContainer");
+    // Load Posts from Firebase
+    async function loadPosts() {
+      const container = document.getElementById('feedContainer');
       try {
         const snapshot = await db.collection("posts").where("status", "==", "pending").get();
+        
         if (snapshot.empty) {
-          container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i> No pending posts found!</div>`;
+          container.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-inbox"></i>
+              <div>No pending posts found!</div>
+            </div>
+          `;
           return;
         }
-        allPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        displayPosts(allPosts);
-      } catch (e) {
-        console.error(e);
-        container.innerHTML = `<div class="error-state"><i class="fas fa-exclamation-triangle"></i> Error loading posts!</div>`;
-      }
-    }
 
-    function displayPosts(posts) {
-      const container = document.getElementById("pendingPostsContainer");
-      if (!posts.length) {
-        container.innerHTML = `<div class="empty-state"><i class="fas fa-search"></i> No posts match your search!</div>`;
-        return;
-      }
-      container.innerHTML = "";
-      posts.forEach(post => {
-        container.innerHTML += `
-          <div class="post-card">
-            <div class="stats-badge">Pending</div>
-            <div class="post-content">
-              <div class="post-title"><i class="fas fa-file-alt"></i>${post.title || "Untitled"}</div>
-              
-              <div class="post-info description"> <i class="fas fa-align-left"></i>
-                <div class="post-info-label">Description</div>
-                <div class="post-info-value">${post.description || "No description provided"}</div>
-              </div>
-              
-              <div class="post-info">
-                 <i class="fas fa-map-marker-alt"></i>
-                <div class="post-info-label">Region</div>
-                <div class="post-info-value">${post.region || "Not specified"}</div>
-              </div>
-              
-              <div class="post-info"> <i class="fas fa-city"></i>
-                <div class="post-info-label">District</div>
-                <div class="post-info-value">${post.district || "Not specified"}</div>
-              </div>
-              
-              <a class="open-btn" href="reply.html?id=${post.id}">
-                <i class="fas fa-reply"></i> Open & Review
-              </a>
-            </div>
+        allPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        displayedPosts = [...allPosts];
+        document.getElementById('postCount').textContent = allPosts.length;
+        
+        container.innerHTML = '';
+        loadMorePosts();
+        setupInfiniteScroll();
+      } catch (error) {
+        console.error('Error loading posts:', error);
+        container.innerHTML = `
+          <div class="error-state">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>Error loading posts!</div>
           </div>
         `;
-      });
+      }
     }
 
+    // Load More Posts
+    function loadMorePosts() {
+      const container = document.getElementById('feedContainer');
+      const postsToLoad = displayedPosts.slice(currentIndex, currentIndex + POSTS_PER_LOAD);
+      
+      if (postsToLoad.length === 0 && currentIndex === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-search"></i>
+            <div>No posts match your search!</div>
+          </div>
+        `;
+        return;
+      }
+
+      postsToLoad.forEach((post, index) => {
+        const card = createPostCard(post, currentIndex + index);
+        container.appendChild(card);
+      });
+
+      currentIndex += postsToLoad.length;
+
+      if (currentIndex < displayedPosts.length) {
+        if (!document.querySelector('.load-more')) {
+          const loadMore = document.createElement('div');
+          loadMore.className = 'load-more';
+          loadMore.textContent = 'Scroll for more...';
+          container.appendChild(loadMore);
+        }
+      } else {
+        const loadMore = document.querySelector('.load-more');
+        if (loadMore) loadMore.remove();
+      }
+    }
+
+    // Create Post Card
+    function createPostCard(post, index) {
+      const card = document.createElement('div');
+      card.className = 'post-card';
+      card.style.animationDelay = `${(index % POSTS_PER_LOAD) * 0.05}s`;
+      
+      card.innerHTML = `
+        <div class="post-header">
+          <div class="post-status">
+            <div class="status-icon">⏳</div>
+            <div class="status-text">
+              <div class="status-label">Status</div>
+              <div class="status-value">Pending Review</div>
+            </div>
+          </div>
+          <div class="post-menu">
+            <i class="fas fa-ellipsis-v"></i>
+          </div>
+        </div>
+
+        <div class="post-content">
+          <div class="post-title">${post.title || 'Untitled Post'}</div>
+          <div class="post-description">
+            ${post.description || 'No description provided for this post.'}
+          </div>
+          <div class="post-meta">
+            <div class="meta-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <span><strong>Region:</strong> ${post.region || 'Not specified'}</span>
+            </div>
+            <div class="meta-item">
+              <i class="fas fa-city"></i>
+              <span><strong>District:</strong> ${post.district || 'Not specified'}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="post-actions">
+          <a href="reply.html?id=${post.id}" class="action-btn primary">
+            <i class="fas fa-reply"></i>
+            Open & Review
+          </a>
+          <button class="action-btn secondary" onclick="sharePost('${post.id}')">
+            <i class="fas fa-share-alt"></i>
+            Share
+          </button>
+        </div>
+      `;
+
+      return card;
+    }
+
+    // Search Functionality
     function filterPosts() {
-      const searchTerm = document.getElementById("searchInput").value.toLowerCase().trim();
-      const clearBtn = document.getElementById("clearSearch");
-      clearBtn.style.display = searchTerm ? "block" : "none";
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+      const clearBtn = document.getElementById('clearSearch');
+      
+      clearBtn.style.display = searchTerm ? 'block' : 'none';
 
-      if (!searchTerm) return displayPosts(allPosts);
+      if (!searchTerm) {
+        displayedPosts = [...allPosts];
+      } else {
+        displayedPosts = allPosts.filter(post => 
+          (post.title || '').toLowerCase().includes(searchTerm) ||
+          (post.region || '').toLowerCase().includes(searchTerm) ||
+          (post.district || '').toLowerCase().includes(searchTerm) ||
+          (post.description || '').toLowerCase().includes(searchTerm)
+        );
+      }
 
-      const filtered = allPosts.filter(post => 
-        (post.region || "").toLowerCase().startsWith(searchTerm) ||
-        (post.district || "").toLowerCase().startsWith(searchTerm)
-      );
-      displayPosts(filtered);
+      currentIndex = 0;
+      document.getElementById('feedContainer').innerHTML = '';
+      loadMorePosts();
     }
 
     function clearSearch() {
-      document.getElementById("searchInput").value = "";
-      document.getElementById("clearSearch").style.display = "none";
-      displayPosts(allPosts);
+      document.getElementById('searchInput').value = '';
+      document.getElementById('clearSearch').style.display = 'none';
+      filterPosts();
     }
 
+    // Infinite Scroll
+    function setupInfiniteScroll() {
+      let isLoading = false;
+
+      window.addEventListener('scroll', () => {
+        if (isLoading || currentIndex >= displayedPosts.length) return;
+
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+
+        if (scrollTop + clientHeight >= scrollHeight - 500) {
+          isLoading = true;
+          setTimeout(() => {
+            loadMorePosts();
+            isLoading = false;
+          }, 300);
+        }
+      });
+    }
+
+    // Scroll to Top
+    const scrollTopBtn = document.getElementById('scrollTop');
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        scrollTopBtn.classList.add('visible');
+      } else {
+        scrollTopBtn.classList.remove('visible');
+      }
+    });
+
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Share Post
+    function sharePost(postId) {
+      const url = `${window.location.origin}/reply.html?id=${postId}`;
+      if (navigator.share) {
+        navigator.share({
+          title: 'Pending Post',
+          text: 'Check out this pending post',
+          url: url
+        });
+      } else {
+        navigator.clipboard.writeText(url);
+        alert('Link copied to clipboard!');
+      }
+    }
+
+    // Initialize
     window.onload = () => {
-      loadPendingPosts();
-      document.getElementById("searchInput").addEventListener("input", filterPosts);
-      document.getElementById("clearSearch").addEventListener("click", clearSearch);
+      loadPosts();
+      document.getElementById('searchInput').addEventListener('input', filterPosts);
+      document.getElementById('clearSearch').addEventListener('click', clearSearch);
     };
   </script>
 </body>

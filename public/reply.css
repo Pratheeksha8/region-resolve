@@ -743,3 +743,17 @@ body::-webkit-scrollbar {
   width: 0;
   height: 0;
 }
+.disabled-btn {
+  opacity: 0.6;            /* slightly faded */
+  cursor: not-allowed;     /* show not-allowed cursor */
+  transform: none !important; /* prevent hover transform */
+  box-shadow: none !important;
+}
+
+/* Also keep submit-btn:disabled fallback (already in your CSS)
+   so both native disabled attribute and JS class have styling */
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Reply - Region Resolve</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -48,6 +48,7 @@
         <h3><i class="fas fa-pen-alt"></i> Post Your Official Reply</h3>
         <p>Please provide your official response to this citizen's concern</p>
       </div>
+      <!-- 🟩 UPDATED: added id replyFormElement (same as before) and left onsubmit as-is -->
       <form id="replyFormElement" onsubmit="submitReply(event)">
         <div class="form-group">
           <label for="uniqueId"><i class="fas fa-id-badge"></i> Official ID</label>
@@ -56,6 +57,7 @@
             <input type="text" id="uniqueId" placeholder="Enter your official unique ID" required>
           </div>
         </div>
+
         <div class="form-group">
           <label for="replyContent"><i class="fas fa-comment-dots"></i> Your Official Response</label>
           <div class="input-wrapper">
@@ -63,19 +65,22 @@
             <textarea id="replyContent" placeholder="Write your official response here..." required></textarea>
           </div>
         </div>
-        <div class="form-group">
-  <label for="statusSelect"><i class="fas fa-flag"></i> Mark Problem As</label>
-  <div class="input-wrapper">
-    <i class="fas fa-check input-icon"></i>
-    <select id="statusSelect" required>
-      <option value="">-- Select Status --</option>
-      <option value="replied">Replied</option>
-      <option value="resolved">Resolved</option>
-    </select>
-  </div>
-</div>
 
-        <button type="submit" class="submit-btn" id="submitButton">
+        <div class="form-group">
+          <label for="statusSelect"><i class="fas fa-flag"></i> Mark Problem As</label>
+          <div class="input-wrapper">
+            <i class="fas fa-check input-icon"></i>
+            <select id="statusSelect" required>
+              <option value="">-- Select Status --</option>
+              <option value="replied">Replied</option>
+              <option value="resolved">Resolved</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 🟩 UPDATED: submit button starts disabled until validation passes -->
+        <!-- ✅ NEW: id="submitButton" already exists in your original file; kept and added disabled attribute -->
+        <button type="submit" class="submit-btn" id="submitButton" disabled>
           <i class="fas fa-paper-plane"></i> Post Reply
         </button>
       </form>
@@ -92,6 +97,7 @@
 
   <div id="customAlert" class="custom-alert"></div>
 </div>
+
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -104,7 +110,6 @@
     messagingSenderId: "833100408662",
     appId: "1:833100408662:web:f294cddaee7840d31c58f7",
     measurementId: "G-QYTJKF31RW"
-
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
@@ -157,6 +162,8 @@
     function showReplyForm(){
       document.getElementById("replyForm").style.display="block";
       document.getElementById("repliesSection").style.display="none";
+      // ✅ NEW: when showing the form, re-run validation so button state is correct
+      validateFormFields();
     }
 
     function showReplies(){
@@ -164,6 +171,48 @@
       document.getElementById("replyForm").style.display="none";
       loadReplies();
     }
+
+    /* ===========================
+       ✅ NEW: validateFormFields()
+       - Enables submitButton only when:
+         * uniqueId non-empty
+         * replyContent non-empty
+         * statusSelect selected (non-empty)
+       - Called on input/change events
+       =========================== */
+    function validateFormFields() {
+      const id = document.getElementById("uniqueId").value.trim();
+      const content = document.getElementById("replyContent").value.trim();
+      const status = document.getElementById("statusSelect").value;
+      const submitBtn = document.getElementById("submitButton");
+
+      if (id && content && status) {
+        submitBtn.disabled = false;
+        // optional visual class removal if you use custom disabled styling
+        submitBtn.classList.remove("disabled-btn"); // ✅ NEW (class exists in reply.css)
+      } else {
+        submitBtn.disabled = true;
+        submitBtn.classList.add("disabled-btn"); // ✅ NEW
+      }
+    }
+
+    /* ===========================
+       ✅ NEW: attach event listeners
+       - Fires validation as user types/selects
+       =========================== */
+    document.addEventListener("DOMContentLoaded", function () {
+      // Attach listeners
+      const idEl = document.getElementById("uniqueId");
+      const contentEl = document.getElementById("replyContent");
+      const statusEl = document.getElementById("statusSelect");
+
+      if (idEl) idEl.addEventListener("input", validateFormFields);
+      if (contentEl) contentEl.addEventListener("input", validateFormFields);
+      if (statusEl) statusEl.addEventListener("change", validateFormFields);
+
+      // Run once on load to set initial button state
+      validateFormFields();
+    });
 
  async function submitReply(e){
   e.preventDefault();
@@ -213,6 +262,10 @@
 
     showAlert("Reply posted and status updated!","success");
     document.getElementById("replyFormElement").reset();
+
+    // ✅ NEW: after reset, re-validate so button becomes disabled again
+    validateFormFields();
+
     showReplies();
 
   } catch(e){
@@ -228,12 +281,12 @@
 
     async function loadReplies(){
       const container = document.getElementById("repliesContainer");
-      container.className="loading"; 
+      container.className="loading";
       container.textContent="Loading replies...";
       try{
         const snapshot = await db.collection("posts").doc(currentPostId).collection("replies").orderBy("createdAt","desc").get();
         if(snapshot.empty){ container.className="no-replies"; container.textContent="No replies yet"; return; }
-        container.className=""; 
+        container.className="";
         container.innerHTML="";
 
         for(const doc of snapshot.docs){
@@ -246,7 +299,6 @@
           if(officialDoc.exists){
             email = officialDoc.data().email || r.officialId;
           }
-
 
       // ✅ Fetch designation from users collection
       let designation = "Unknown";
