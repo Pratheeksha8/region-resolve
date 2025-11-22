@@ -231,7 +231,7 @@ async function logout() {
 function switchTab(tab) {
   document.querySelectorAll(".nav-item").forEach((i) => i.classList.remove("active"));
   document.querySelector(`[data-tab="${tab}"]`).classList.add("active");
-  if (tab === "allpost") window.location.href = "all-post.html";
+  if (tab === "allpost") window.location.href = "all-postlocal.html";
   if (tab === "post") window.location.href = "post-form.html";
 }
 
