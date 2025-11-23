@@ -515,3 +515,21 @@ body {
 .alert.success { background-color: #2ecc71; }  /* Green */
 .alert.error { background-color: #e74c3c; }    /* Red */
 .alert.warning { background-color: #f39c12; }  /* Orange */
+
+.post-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.post-image {
+  width: 90px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-left: 12px;
+}

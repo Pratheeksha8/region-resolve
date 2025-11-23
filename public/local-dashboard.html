@@ -194,6 +194,7 @@ async function loadUserPosts(uid) {
       const postEl = document.createElement("div");
       postEl.className = "post-item";
       postEl.innerHTML = `
+       <div style="flex:1;">
         <h4>${post.title}</h4>
         <p>${post.description ? post.description.substring(0, 10) + (post.description.length > 10 ? "..." : "") : ""}</p>
         <small>${post.district}, ${post.region}</small><br>
@@ -201,6 +202,8 @@ async function loadUserPosts(uid) {
         <div style="margin-top:10px;">
           <button class="delete-btn" data-id="${postId}">Delete</button>
         </div>
+        </div>
+        ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-image" alt="Post Image">` : ""}
       `;
       userPostsDiv.appendChild(postEl);
     });
@@ -232,7 +235,7 @@ function switchTab(tab) {
   document.querySelectorAll(".nav-item").forEach((i) => i.classList.remove("active"));
   document.querySelector(`[data-tab="${tab}"]`).classList.add("active");
   if (tab === "allpost") window.location.href = "all-postlocal.html";
-  if (tab === "post") window.location.href = "post-form.html";
+  if (tab === "post") window.location.href = "postformlatest.html";
 }
 
 function showAlert(message, type = "info") {

@@ -176,10 +176,13 @@
         const postEl = document.createElement("div");
         postEl.className = "post-item";
         postEl.innerHTML = `
+        <div style="flex:1;">
           <h4>${post.title}</h4>
           <p>${post.description ? post.description.substring(0, 50) + (post.description.length > 50 ? "..." : "") : ""}</p>
           <small>📍 ${post.district || ""}, ${post.region || ""}</small><br>
           <small>Status: <strong>${post.status || "pending"}</strong></small>
+          </div>
+           ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-image">` : ""}
         `;
         userPostsDiv.appendChild(postEl);
       });
@@ -213,7 +216,7 @@
     document.querySelectorAll(".nav-item").forEach((i) => i.classList.remove("active"));
     document.querySelector(`[data-tab="${tab}"]`).classList.add("active");
     if (tab === "allpost") {
-      window.location.href = "all-post.html";
+      window.location.href = "all-postlatest.html";
     }
   }
 
